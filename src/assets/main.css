@@ -1,0 +1,126 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-sumi-paper text-sumi-ink;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  
+  .sanskrit-text {
+    @apply font-sanskrit leading-relaxed text-sumi-charcoal;
+    font-size: clamp(1rem, 4vw, 1.25rem);
+    letter-spacing: 0.025em;
+  }
+  
+  .verse-text {
+    @apply sanskrit-text;
+    font-size: clamp(1.125rem, 4.5vw, 1.5rem);
+    line-height: 1.8;
+    margin-bottom: 1.5rem;
+  }
+  
+  /* Mobile touch optimizations */
+  .touch-target {
+    @apply min-h-[44px] min-w-[44px];
+  }
+  
+  /* Smooth scrolling for mobile */
+  html {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+@layer components {
+  /* Sumi-e inspired components */
+  .sumi-card {
+    @apply bg-sumi-cloud border border-sumi-mist/20 rounded-lg shadow-paper;
+    background: linear-gradient(145deg, #fafaf9 0%, #f5f5f4 100%);
+  }
+  
+  .sumi-button {
+    @apply px-6 py-3 rounded-lg font-medium transition-all duration-200;
+    @apply bg-sumi-ink text-sumi-paper hover:bg-sumi-charcoal;
+    @apply border border-sumi-stone/20 shadow-sumi;
+    @apply hover:shadow-ink transform hover:-translate-y-0.5;
+  }
+  
+  .sumi-button-secondary {
+    @apply px-6 py-3 rounded-lg font-medium transition-all duration-200;
+    @apply bg-sumi-paper text-sumi-ink border-2 border-sumi-stone;
+    @apply hover:bg-sumi-cloud hover:border-sumi-charcoal;
+  }
+  
+  .vedic-accent {
+    @apply text-vedic-saffron;
+  }
+  
+  .vedic-accent-bg {
+    @apply bg-vedic-saffron/10 border-l-4 border-vedic-saffron;
+  }
+  
+  /* Navigation with sumi-e aesthetics */
+  .sumi-nav {
+    @apply bg-sumi-paper/95 backdrop-blur-sm border-b border-sumi-mist/30;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  }
+  
+  /* Sanskrit text with ink brush effect */
+  .ink-text {
+    @apply sanskrit-text animate-ink-brush;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Minimalist verse container */
+  .verse-container {
+    @apply sumi-card p-6 mb-6 hover:shadow-ink transition-all duration-300;
+    @apply border-l-4 border-transparent hover:border-vedic-saffron;
+  }
+  
+  /* Zen-inspired spacing */
+  .zen-spacing {
+    @apply space-y-8;
+  }
+  
+  .zen-spacing-sm {
+    @apply space-y-4;
+  }
+  
+  /* Chapter/section headers with brush stroke inspiration */
+  .brush-heading {
+    @apply text-2xl font-medium text-sumi-ink mb-4;
+    @apply border-b-2 border-vedic-saffron/30 pb-2;
+    position: relative;
+  }
+  
+  .brush-heading::before {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 3rem;
+    height: 2px;
+    background: linear-gradient(90deg, #ff6b35, transparent);
+  }
+  
+  /* Transliteration toggle with ink brush aesthetic */
+  .script-toggle {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-sm;
+    @apply bg-sumi-cloud border border-sumi-mist;
+    @apply hover:bg-vedic-saffron/10 hover:border-vedic-saffron/30;
+    @apply transition-all duration-200;
+  }
+  
+  /* Mobile-first responsive utilities */
+  .mobile-padding {
+    @apply px-4 sm:px-6 lg:px-8;
+  }
+  
+  .mobile-text {
+    @apply text-sm sm:text-base lg:text-lg;
+  }
+}
