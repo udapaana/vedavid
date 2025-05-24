@@ -1,5 +1,3 @@
-import Sanscript from '@indic-transliteration/sanscript';
-
 export interface TransliterationOption {
   name: string;
   label: string;
@@ -9,7 +7,7 @@ export interface TransliterationOption {
 export const SUPPORTED_SCRIPTS: TransliterationOption[] = [
   { name: 'devanagari', label: 'देवनागरी', script: 'devanagari' },
   { name: 'iast', label: 'IAST', script: 'iast' },
-  { name: 'harvard-kyoto', label: 'Harvard-Kyoto', script: 'hk' },
+  { name: 'harvard-kyoto', label: 'Harvard-Kyoto', script: 'harvard-kyoto' },
   { name: 'baraha', label: 'Baraha', script: 'baraha' },
   { name: 'itrans', label: 'ITRANS', script: 'itrans' },
   { name: 'tamil', label: 'தமிழ்', script: 'tamil' },
@@ -17,11 +15,16 @@ export const SUPPORTED_SCRIPTS: TransliterationOption[] = [
   { name: 'kannada', label: 'ಕನ್ನಡ', script: 'kannada' },
   { name: 'malayalam', label: 'മലയാളം', script: 'malayalam' },
   { name: 'gujarati', label: 'ગુજરાતી', script: 'gujarati' },
+  { name: 'slp1', label: 'SLP1', script: 'slp1' },
+  { name: 'velthuis', label: 'Velthuis', script: 'velthuis' },
+  { name: 'wx', label: 'WX', script: 'wx' },
 ];
 
 export class TransliterationService {
   private static instance: TransliterationService;
   private currentScript: string = 'devanagari';
+  private transliterationCache = new Map<string, string>();
+  private scriptChangeListeners: (() => void)[] = [];
   
   static getInstance(): TransliterationService {
     if (!TransliterationService.instance) {
@@ -36,8 +39,26 @@ export class TransliterationService {
   
   setCurrentScript(script: string): void {
     this.currentScript = script;
+    this.notifyScriptChange();
   }
   
+  /**
+   * Get static transliteration from pre-generated data.
+   * Falls back to original text if transliteration not available.
+   */
+  getStaticTransliteration(transliterations: Record<string, string> | undefined, targetScript?: string): string {
+    if (!transliterations) {
+      return '';
+    }
+    
+    const script = targetScript || this.currentScript;
+    return transliterations[script] || transliterations['baraha'] || '';
+  }
+  
+  /**
+   * Transliterate text using Aksharamukha API.
+   * Returns original text immediately, then updates cache with transliteration.
+   */
   transliterate(text: string, fromScript: string = 'baraha', toScript?: string): string {
     if (!text) return '';
     
@@ -48,23 +69,84 @@ export class TransliterationService {
       return text;
     }
     
+    // Check cache first
+    const cacheKey = `${fromScript}-${targetScript}-${text}`;
+    const cached = this.transliterationCache.get(cacheKey);
+    if (cached) {
+      return cached;
+    }
+    
+    // Start async transliteration and cache result
+    this.transliterateAsync(text, fromScript, targetScript).then(result => {
+      this.transliterationCache.set(cacheKey, result);
+      // Force reactive update
+      this.notifyScriptChange();
+    });
+    
+    // Return original text immediately
+    return text;
+  }
+
+  /**
+   * Async transliteration using local Vidyut FastAPI server
+   */
+  private async transliterateAsync(text: string, fromScript: string, toScript: string): Promise<string> {
     try {
-      // Transliterate from source script to target script
-      return Sanscript.t(text, fromScript, targetScript);
+      // Call local FastAPI server
+      const response = await fetch('http://localhost:5001/transliterate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          text: text,
+          source: fromScript,
+          target: toScript
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Server error: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      return data.result || text;
+      
     } catch (error) {
-      console.warn('Transliteration failed:', error);
-      return text; // Return original text if transliteration fails
+      console.warn('Local transliteration failed, using original text:', error);
+      return text;
+    }
+  }
+
+  /**
+   * Notify listeners of script changes (for reactive updates)
+   */
+  private notifyScriptChange(): void {
+    this.scriptChangeListeners.forEach(listener => listener());
+  }
+
+  /**
+   * Add a listener for script changes
+   */
+  addScriptChangeListener(listener: () => void): void {
+    this.scriptChangeListeners.push(listener);
+  }
+
+  /**
+   * Remove a script change listener
+   */
+  removeScriptChangeListener(listener: () => void): void {
+    const index = this.scriptChangeListeners.indexOf(listener);
+    if (index > -1) {
+      this.scriptChangeListeners.splice(index, 1);
     }
   }
   
-  transliterateToAll(text: string, fromScript: string = 'baraha'): Record<string, string> {
-    const results: Record<string, string> = {};
-    
-    SUPPORTED_SCRIPTS.forEach(script => {
-      results[script.name] = this.transliterate(text, fromScript, script.script);
-    });
-    
-    return results;
+  /**
+   * Get all available transliterations from static data.
+   */
+  getAllStaticTransliterations(transliterations: Record<string, string> | undefined): Record<string, string> {
+    return transliterations || {};
   }
   
   detectScript(text: string): string {

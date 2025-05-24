@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, computed, readonly } from 'vue'
 import type { VedaCorpus, NavigationState, TextDisplayOptions } from '@/types/veda'
 import { vedaService } from '@/services/vedaService'
+import { transliterationService } from '@/services/transliterationService'
 
 export const useVedaStore = defineStore('veda', () => {
   const corpus = ref<VedaCorpus | null>(null)
@@ -18,6 +19,8 @@ export const useVedaStore = defineStore('veda', () => {
     showSamhita: true,
     fontSize: 'md'
   })
+  
+  const currentScript = ref(transliterationService.getCurrentScript())
   
   const isLoaded = computed(() => corpus.value !== null)
   
@@ -57,17 +60,34 @@ export const useVedaStore = defineStore('veda', () => {
     displayOptions.value = { ...displayOptions.value, ...options }
   }
   
+  function setCurrentScript(script: string) {
+    currentScript.value = script
+    transliterationService.setCurrentScript(script)
+  }
+  
+  function getStaticTransliteration(transliterations: Record<string, string> | undefined) {
+    return transliterationService.getStaticTransliteration(transliterations, currentScript.value)
+  }
+
+  function transliterate(text: string, fromScript?: string, toScript?: string) {
+    return transliterationService.transliterate(text, fromScript, toScript || currentScript.value)
+  }
+  
   return {
     corpus: readonly(corpus),
     loading: readonly(loading),
     error: readonly(error),
     navigation: readonly(navigation),
     displayOptions: readonly(displayOptions),
+    currentScript: readonly(currentScript),
     isLoaded,
     availableChapters,
     loadCorpus,
     setCurrentSection,
     setCurrentVerse,
-    updateDisplayOptions
+    updateDisplayOptions,
+    setCurrentScript,
+    getStaticTransliteration,
+    transliterate
   }
 })

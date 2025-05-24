@@ -9,12 +9,8 @@
             VedaVid
           </h1>
         </div>
-        <p class="text-lg sm:text-xl text-sumi-charcoal mb-8 max-w-3xl mx-auto leading-relaxed">
-          A digital sanctuary for <span class="vedic-accent font-medium">Veda Adhyayana</span>, 
-          where ancient Sanskrit wisdom meets modern accessibility through the art of mindful study.
-        </p>
         <div class="text-base text-sumi-stone mb-12">
-          <p class="sanskrit-text mb-2">तैत्तिरीय शाखा • Taittiriya Sakha</p>
+          <p class="sanskrit-text mb-2">{{ vedaStore.transliterate('taittirIya SAKhA') }}</p>
           <p class="text-sm mobile-text">
             {{ corpus?.metadata.totals.total_texts.toLocaleString() }} texts across the complete corpus • 
             {{ corpus?.metadata.totals.total_files_processed }} source manuscripts digitized
@@ -31,12 +27,9 @@
         >
           <div class="text-center">
             <div class="w-16 h-16 bg-vedic-saffron/10 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-vedic-saffron/20 transition-colors">
-              <span class="text-2xl text-vedic-saffron">संहिता</span>
+              <span class="text-2xl text-vedic-saffron">{{ vedaStore.transliterate('saṃhitA') }}</span>
             </div>
-            <h3 class="brush-heading text-lg">Samhita</h3>
-            <p class="text-sumi-charcoal mb-4 leading-relaxed">
-              Sacred mantras in both <em>padam</em> (word-by-word) and <em>samhita</em> (continuous) recitations
-            </p>
+            <h3 class="brush-heading text-lg">{{ vedaStore.transliterate('saṃhitA') }}</h3>
             <div class="text-sm text-sumi-mist">
               {{ samhitaStats.kandas }} Kandas • {{ samhitaStats.chapters }} Chapters
               <br />
@@ -52,12 +45,9 @@
         >
           <div class="text-center">
             <div class="w-16 h-16 bg-vedic-turmeric/10 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-vedic-turmeric/20 transition-colors">
-              <span class="text-2xl text-vedic-turmeric">ब्राह्मण</span>
+              <span class="text-2xl text-vedic-turmeric">{{ vedaStore.transliterate('brAhmaṇa') }}</span>
             </div>
-            <h3 class="brush-heading text-lg">Brahmana</h3>
-            <p class="text-sumi-charcoal mb-4 leading-relaxed">
-              Prose explanations unfolding the deeper meanings and ritual applications
-            </p>
+            <h3 class="brush-heading text-lg">{{ vedaStore.transliterate('brAhmaṇa') }}</h3>
             <div class="text-sm text-sumi-mist">
               {{ brahmanaStats.books }} Books
               <br />
@@ -73,12 +63,9 @@
         >
           <div class="text-center">
             <div class="w-16 h-16 bg-vedic-copper/10 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-vedic-copper/20 transition-colors">
-              <span class="text-2xl text-vedic-copper">आरण्यक</span>
+              <span class="text-2xl text-vedic-copper">{{ vedaStore.transliterate('AraṇyAka') }}</span>
             </div>
-            <h3 class="brush-heading text-lg">Aranyaka</h3>
-            <p class="text-sumi-charcoal mb-4 leading-relaxed">
-              Forest teachings revealing the philosophical and mystical dimensions
-            </p>
+            <h3 class="brush-heading text-lg">{{ vedaStore.transliterate('AraṇyAka') }}</h3>
             <div class="text-sm text-sumi-mist">
               {{ aranyakaStats.books }} Books
               <br />
@@ -86,55 +73,6 @@
             </div>
           </div>
         </router-link>
-      </div>
-      
-      <!-- About Section -->
-      <div class="sumi-card p-8 lg:p-12 animate-slide-up" style="animation-delay: 0.4s">
-        <h2 class="brush-heading text-center mb-8">
-          About the Taittiriya Tradition
-        </h2>
-        <div class="max-w-4xl mx-auto zen-spacing-sm">
-          <p class="text-sumi-charcoal leading-relaxed mb-6">
-            The <span class="sanskrit-text vedic-accent">Taittiriya Sakha</span> represents one of the most 
-            important recensions of the Krishna Yajurveda, preserving ancient Vedic knowledge through 
-            precise oral transmission traditions spanning millennia.
-          </p>
-          <p class="text-sumi-charcoal leading-relaxed mb-6">
-            This digital collection provides complete access to the three-fold corpus: 
-            <span class="vedic-accent">Samhita</span> (sacred mantras), 
-            <span class="vedic-accent">Brahmana</span> (ritual explanations), and 
-            <span class="vedic-accent">Aranyaka</span> (philosophical teachings), maintaining both 
-            word-by-word and continuous recitation formats.
-          </p>
-          <p class="text-sumi-charcoal leading-relaxed">
-            VedaVid honors these sacred texts through mindful design, making them accessible for study, 
-            research, and practice while preserving the integrity of traditional transmission methods.
-          </p>
-        </div>
-        
-        <!-- Features -->
-        <div class="mt-12 grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div class="text-center">
-            <div class="text-vedic-saffron mb-2">॰</div>
-            <h4 class="text-sm font-medium text-sumi-ink mb-1">Multi-script</h4>
-            <p class="text-xs text-sumi-mist">10+ Indian scripts</p>
-          </div>
-          <div class="text-center">
-            <div class="text-vedic-saffron mb-2">॰</div>
-            <h4 class="text-sm font-medium text-sumi-ink mb-1">Mobile-first</h4>
-            <p class="text-xs text-sumi-mist">Optimized for phones</p>
-          </div>
-          <div class="text-center">
-            <div class="text-vedic-saffron mb-2">॰</div>
-            <h4 class="text-sm font-medium text-sumi-ink mb-1">Complete corpus</h4>
-            <p class="text-xs text-sumi-mist">4,903 total texts</p>
-          </div>
-          <div class="text-center">
-            <div class="text-vedic-saffron mb-2">॰</div>
-            <h4 class="text-sm font-medium text-sumi-ink mb-1">Tradition-faithful</h4>
-            <p class="text-xs text-sumi-mist">Authentic recitations</p>
-          </div>
-        </div>
       </div>
     </div>
   </div>

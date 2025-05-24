@@ -52,7 +52,7 @@
           :key="script.name"
           @click="setScript(script.script)"
           class="text-xs px-2 py-1 rounded bg-sumi-paper border border-sumi-mist hover:bg-vedic-saffron/10 hover:border-vedic-saffron/30 transition-colors"
-          :class="{ 'bg-vedic-saffron/10 border-vedic-saffron/30': currentScript === script.script }"
+          :class="{ 'bg-vedic-saffron/10 border-vedic-saffron/30': vedaStore.currentScript === script.script }"
         >
           {{ script.label }}
         </button>
@@ -70,9 +70,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted, onUnmounted } from 'vue'
 import type { SamhitaVerse } from '@/types/veda'
 import { transliterationService, SUPPORTED_SCRIPTS } from '@/services/transliterationService'
+import { useVedaStore } from '@/stores/vedaStore'
 
 interface Props {
   verse: SamhitaVerse
@@ -82,8 +83,9 @@ interface Props {
 }
 
 const props = defineProps<Props>()
+const vedaStore = useVedaStore()
 const showTransliterationOptions = ref(false)
-const currentScript = ref(transliterationService.getCurrentScript())
+const forceRerender = ref(0)
 
 const fontSizeClass = computed(() => {
   const sizes = {
@@ -96,29 +98,53 @@ const fontSizeClass = computed(() => {
 })
 
 const transliteratedPadam = computed(() => {
+  // Include forceRerender to make this reactive to cache updates
+  forceRerender.value;
+  
   if (!props.verse.padam) return ''
-  return transliterationService.transliterate(props.verse.padam, 'baraha', currentScript.value)
+  
+  // Use static transliteration if available (preferred)
+  if (props.verse.padam_transliterations) {
+    return vedaStore.getStaticTransliteration(props.verse.padam_transliterations)
+  }
+  
+  // Fallback to Aksharamukha transliteration for runtime conversion
+  return vedaStore.transliterate(props.verse.padam, 'baraha')
 })
 
 const transliteratedSamhita = computed(() => {
+  // Include forceRerender to make this reactive to cache updates
+  forceRerender.value;
+  
   if (!props.verse.samhita) return ''
-  return transliterationService.transliterate(props.verse.samhita, 'baraha', currentScript.value)
+  
+  // Use static transliteration if available (preferred)
+  if (props.verse.samhita_transliterations) {
+    return vedaStore.getStaticTransliteration(props.verse.samhita_transliterations)
+  }
+  
+  // Fallback to Aksharamukha transliteration for runtime conversion
+  return vedaStore.transliterate(props.verse.samhita, 'baraha')
 })
 
 const alternativeScripts = computed(() => {
-  return SUPPORTED_SCRIPTS.filter(script => script.script !== currentScript.value)
+  return SUPPORTED_SCRIPTS.filter(script => script.script !== vedaStore.currentScript)
 })
 
 const setScript = (script: string) => {
-  currentScript.value = script
-  transliterationService.setCurrentScript(script)
+  vedaStore.setCurrentScript(script)
 }
 
-// Listen for global script changes
-const handleScriptChange = () => {
-  currentScript.value = transliterationService.getCurrentScript()
+// Handle cache updates
+const handleCacheUpdate = () => {
+  forceRerender.value++
 }
 
-// Update current script when global service changes
-setInterval(handleScriptChange, 100) // Simple polling for reactivity
+onMounted(() => {
+  transliterationService.addScriptChangeListener(handleCacheUpdate)
+})
+
+onUnmounted(() => {
+  transliterationService.removeScriptChangeListener(handleCacheUpdate)
+})
 </script>

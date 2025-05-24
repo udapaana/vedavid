@@ -13,14 +13,16 @@
       class="sanskrit-text p-4 bg-amber-50 rounded border-l-4 border-amber-400"
       :class="fontSizeClass"
     >
-      {{ section.text }}
+      {{ transliteratedText }}
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, onMounted, onUnmounted } from 'vue'
 import type { BrahmanaSection } from '@/types/veda'
+import { useVedaStore } from '@/stores/vedaStore'
+import { transliterationService } from '@/services/transliterationService'
 
 interface Props {
   section: BrahmanaSection
@@ -28,6 +30,36 @@ interface Props {
 }
 
 const props = defineProps<Props>()
+const vedaStore = useVedaStore()
+const forceRerender = ref(0)
+
+const transliteratedText = computed(() => {
+  // Include forceRerender to make this reactive to cache updates
+  forceRerender.value;
+  
+  if (!props.section.text) return ''
+  
+  // Use static transliteration if available (preferred)
+  if (props.section.text_transliterations) {
+    return vedaStore.getStaticTransliteration(props.section.text_transliterations)
+  }
+  
+  // Fallback to Aksharamukha transliteration for runtime conversion
+  return vedaStore.transliterate(props.section.text, 'baraha')
+})
+
+// Handle cache updates
+const handleCacheUpdate = () => {
+  forceRerender.value++
+}
+
+onMounted(() => {
+  transliterationService.addScriptChangeListener(handleCacheUpdate)
+})
+
+onUnmounted(() => {
+  transliterationService.removeScriptChangeListener(handleCacheUpdate)
+})
 
 const fontSizeClass = computed(() => {
   const sizes = {

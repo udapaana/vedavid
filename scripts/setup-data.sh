@@ -58,4 +58,7 @@ else
 fi
 
 echo ""
-echo "🚀 You can now run: npm run dev"
+echo "📝 Optional: Generate transliterations for all scripts:"
+echo "   pnpm run generate-transliterations"
+echo ""
+echo "🚀 You can now run: pnpm run dev"

@@ -20,6 +20,8 @@ export interface SamhitaVerse {
   padam?: string
   samhita?: string
   has_samhita_match: boolean
+  padam_transliterations?: Record<string, string>
+  samhita_transliterations?: Record<string, string>
 }
 
 export interface SamhitaChapter {
@@ -35,6 +37,7 @@ export interface BrahmanaSection {
   file_info: string
   text: string
   text_type: 'brahmana' | 'aranyaka'
+  text_transliterations?: Record<string, string>
 }
 
 export interface BrahmanaBook {

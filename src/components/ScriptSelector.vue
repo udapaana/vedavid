@@ -37,14 +37,14 @@
             class="w-full text-left px-3 py-2 rounded-md text-sm transition-colors duration-150"
             :class="{
               'bg-vedic-saffron/10 text-vedic-saffron border-l-2 border-vedic-saffron': 
-                currentScript === script.script,
+                vedaStore.currentScript === script.script,
               'hover:bg-sumi-mist/10 text-sumi-ink': 
-                currentScript !== script.script
+                vedaStore.currentScript !== script.script
             }"
           >
             <div class="flex justify-between items-center">
               <span>{{ script.label }}</span>
-              <span v-if="currentScript === script.script" class="text-vedic-saffron">✓</span>
+              <span v-if="vedaStore.currentScript === script.script" class="text-vedic-saffron">✓</span>
             </div>
           </button>
         </div>
@@ -54,16 +54,22 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { ChevronDownIcon } from '@heroicons/vue/24/outline'
 import { transliterationService, SUPPORTED_SCRIPTS, type TransliterationOption } from '../services/transliterationService'
+import { useVedaStore } from '@/stores/vedaStore'
 
+const vedaStore = useVedaStore()
 const isOpen = ref(false)
-const currentScript = ref(transliterationService.getCurrentScript())
 const scripts = SUPPORTED_SCRIPTS
 
 const currentScriptLabel = computed(() => {
-  return transliterationService.getScriptLabel(currentScript.value)
+  return transliterationService.getScriptLabel(vedaStore.currentScript)
+})
+
+// Watch for external script changes and sync
+watch(() => vedaStore.currentScript, (newScript) => {
+  transliterationService.setCurrentScript(newScript)
 })
 
 const toggleDropdown = () => {
@@ -71,8 +77,7 @@ const toggleDropdown = () => {
 }
 
 const selectScript = (script: TransliterationOption) => {
-  currentScript.value = script.script
-  transliterationService.setCurrentScript(script.script)
+  vedaStore.setCurrentScript(script.script)
   isOpen.value = false
   
   // Emit event to parent components can react to script changes

@@ -17,21 +17,21 @@
               class="text-sumi-charcoal hover:text-vedic-saffron transition-colors touch-target flex items-center"
               :class="{ 'text-vedic-saffron font-medium': $route.name === 'samhita' }"
             >
-              संहिता
+              {{ vedaStore.transliterate('saṃhitA') }}
             </router-link>
             <router-link 
               to="/brahmana"
               class="text-sumi-charcoal hover:text-vedic-saffron transition-colors touch-target flex items-center"
               :class="{ 'text-vedic-saffron font-medium': $route.name === 'brahmana' }"
             >
-              ब्राह्मण
+              {{ vedaStore.transliterate('brAhmaṇa') }}
             </router-link>
             <router-link 
               to="/aranyaka"
               class="text-sumi-charcoal hover:text-vedic-saffron transition-colors touch-target flex items-center"
               :class="{ 'text-vedic-saffron font-medium': $route.name === 'aranyaka' }"
             >
-              आरण्यक
+              {{ vedaStore.transliterate('AraṇyAka') }}
             </router-link>
           </div>
         </div>
@@ -76,7 +76,7 @@
           class="block px-3 py-3 rounded-md hover:bg-sumi-cloud transition-colors touch-target text-sumi-charcoal"
           :class="{ 'bg-vedic-saffron/10 text-vedic-saffron font-medium': $route.name === 'samhita' }"
         >
-          संहिता
+          {{ vedaStore.transliterate('saṃhitA') }}
         </router-link>
         <router-link 
           to="/brahmana"
@@ -84,7 +84,7 @@
           class="block px-3 py-3 rounded-md hover:bg-sumi-cloud transition-colors touch-target text-sumi-charcoal"
           :class="{ 'bg-vedic-saffron/10 text-vedic-saffron font-medium': $route.name === 'brahmana' }"
         >
-          ब्राह्मण
+          {{ vedaStore.transliterate('brAhmaṇa') }}
         </router-link>
         <router-link 
           to="/aranyaka"
@@ -92,7 +92,7 @@
           class="block px-3 py-3 rounded-md hover:bg-sumi-cloud transition-colors touch-target text-sumi-charcoal"
           :class="{ 'bg-vedic-saffron/10 text-vedic-saffron font-medium': $route.name === 'aranyaka' }"
         >
-          आरण्यक
+          {{ vedaStore.transliterate('AraṇyAka') }}
         </router-link>
         
         <!-- Mobile script selector -->
@@ -200,8 +200,6 @@ function saveDisplayOptions() {
 }
 
 function handleScriptChange(script: string) {
-  // Script change is handled by the transliteration service
-  // Components will reactively update when they use the service
-  console.log('Script changed to:', script)
+  vedaStore.setCurrentScript(script)
 }
 </script>

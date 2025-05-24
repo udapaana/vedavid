@@ -22,6 +22,26 @@ VedaVid is a mobile-first Vue.js Single Page Application (SPA) designed for Veda
 - **Performance**: Lazy loading and efficient data fetching
 - **Accessibility**: Proper semantic HTML and keyboard navigation
 
+## Transliteration System
+
+### Architecture
+VedaVid uses a two-tier transliteration system:
+- **FastAPI Server**: Local Vidyut-lipi server for high-quality Sanskrit transliteration
+- **Frontend Service**: Caching layer with graceful fallbacks
+
+### Supported Scripts
+- **Devanagari** (देवनागरी) - Primary display script
+- **IAST** - International standard romanization  
+- **Harvard-Kyoto** - Academic transliteration
+- **Baraha** - Source script for most texts
+- **Regional Scripts**: Tamil, Telugu, Kannada, Malayalam, Gujarati
+- **Technical**: ITRANS, SLP1, Velthuis, WX
+
+### Usage
+1. Start transliteration server: `pnpm run transliteration-server`
+2. Select scripts from the dropdown in navigation
+3. Text automatically transliterates with caching for performance
+
 ## Data Integration
 
 ### Data Sources
@@ -41,12 +61,25 @@ The app uses a configurable data service (`src/services/vedaService.ts`) that ca
 ```bash
 pnpm install          # Install dependencies
 pnpm run setup       # Setup data symlink (runs ./scripts/setup-data.sh)
-pnpm run dev         # Start dev server with mobile network access
+```
+
+### Development Server
+VedaVid requires two servers for full functionality:
+
+**Terminal 1 - Transliteration Server:**
+```bash
+pnpm run transliteration-server  # FastAPI server on http://localhost:5001
+```
+
+**Terminal 2 - Frontend Server:**
+```bash
+pnpm run dev         # Vite dev server with mobile network access
 ```
 
 ### Testing
 - **Desktop**: http://localhost:3000
 - **Mobile**: Use Network URL from terminal output (e.g., http://192.168.1.x:3000)
+- **API Docs**: http://localhost:5001/docs (transliteration server documentation)
 - Test on actual mobile devices for touch interactions and typography
 
 ### Build Commands
@@ -60,27 +93,37 @@ pnpm run preview     # Preview build with mobile access
 ## File Structure
 
 ```
-src/
-├── components/          # Reusable Vue components
-│   ├── VedaNavigation.vue    # Main navigation with mobile menu
-│   ├── SamhitaVerse.vue      # Verse display component
-│   ├── BrahmanaSection.vue   # Prose section component
-│   └── ChapterSelector.vue   # Chapter/book selection
-├── views/              # Page-level components
-│   ├── HomeView.vue         # Landing page with corpus overview
-│   ├── SamhitaView.vue      # Samhita text browser
-│   ├── BrahmanaView.vue     # Brahmana text browser
-│   └── AranyakaView.vue     # Aranyaka text browser
-├── stores/             # Pinia state management
-│   └── vedaStore.ts         # Main application state
-├── services/           # Data services
-│   └── vedaService.ts       # API abstraction layer
-├── types/              # TypeScript definitions
-│   └── veda.ts             # Core data types
-├── config/             # Configuration
-│   └── dataConfig.ts       # Data source configuration
-└── router/             # Vue Router setup
-    └── index.ts
+├── server/
+│   └── transliteration-server.py    # FastAPI server with Vidyut-lipi
+├── scripts/
+│   ├── setup-data.sh                # Data symlink setup
+│   ├── generate-transliterations.sh # Static transliteration generation
+│   └── start-transliteration-server.sh # Server startup script
+├── src/
+│   ├── components/          # Reusable Vue components
+│   │   ├── VedaNavigation.vue    # Main navigation with mobile menu
+│   │   ├── SamhitaVerse.vue      # Verse display component
+│   │   ├── BrahmanaSection.vue   # Prose section component
+│   │   ├── ScriptSelector.vue    # Script selection dropdown
+│   │   └── ChapterSelector.vue   # Chapter/book selection
+│   ├── views/              # Page-level components
+│   │   ├── HomeView.vue         # Landing page with corpus overview
+│   │   ├── SamhitaView.vue      # Samhita text browser
+│   │   ├── BrahmanaView.vue     # Brahmana text browser
+│   │   └── AranyakaView.vue     # Aranyaka text browser
+│   ├── stores/             # Pinia state management
+│   │   └── vedaStore.ts         # Main application state
+│   ├── services/           # Data and transliteration services
+│   │   ├── vedaService.ts       # API abstraction layer
+│   │   └── transliterationService.ts # Transliteration service
+│   ├── types/              # TypeScript definitions
+│   │   └── veda.ts             # Core data types
+│   ├── config/             # Configuration
+│   │   └── dataConfig.ts       # Data source configuration
+│   └── router/             # Vue Router setup
+│       └── index.ts
+└── public/data/taittiriya/
+    └── transliteration-env/ # Python virtual environment for Vidyut
 ```
 
 ## Mobile Optimizations
